@@ -17,7 +17,7 @@ services:
     depends_on:
       - timescaledb
     volumes:
-      - ./var/log/endlessh.log:/endlessh.log
+      - /var/log/endlessh.log:/endlessh.log
     restart: always
   timescaledb:
     image: timescale/timescaledb:latest-pg14
@@ -28,4 +28,4 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
-      - /data/timescaledb:/var/lib/postgresql/dat
+      - /var/docker-volumes/endlesssh-to-postgres/timescaledb:/var/lib/postgresql/dat
