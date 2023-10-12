@@ -19,6 +19,9 @@ services:
     volumes:
       - /var/log/endlessh.log:/endlessh.log
     restart: always
+    networks:
+      - endlessh_to_postgres
+
   timescaledb:
     image: timescale/timescaledb:latest-pg14
     restart: always
@@ -29,3 +32,13 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
       - /var/docker-volumes/endlesssh-to-postgres/timescaledb:/var/lib/postgresql/dat
+    networks:
+      - endlessh_to_postgres
+
+
+
+networks:
+  endlessh_to_postgres:
+    ipam:
+      config:
+        - subnet: 10.2.1.0/24
