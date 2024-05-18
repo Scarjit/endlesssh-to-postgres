@@ -21,7 +21,6 @@ services:
     restart: always
     networks:
       - endlessh_to_postgres
-      - grafana_influx_grafana_net
 
   timescaledb:
     image: timescale/timescaledb:latest-pg14
