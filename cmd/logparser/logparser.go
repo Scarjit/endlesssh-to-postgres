@@ -19,7 +19,6 @@ func ParseLog(db *sql.DB) error {
 	if err != nil {
 		return err
 	}
-	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
 	var lines []LogLine
@@ -42,6 +41,13 @@ func ParseLog(db *sql.DB) error {
 
 	for _, line := range lines {
 		HandleLine(line, db)
+	}
+
+	// Reset log file
+	file.Close()
+	err = os.Truncate("/endlessh.log", 0)
+	if err != nil {
+		return err
 	}
 
 	return nil

@@ -24,11 +24,20 @@ type IPInfo struct {
 	Timezone string `json:"timezone"`
 }
 
+var localCache map[string]IPInfo
+
 func InsertAndSelectIPInfoIntoDB(db *sql.DB, ip net.IP) (IPInfo, error) {
 
 	var ipInfo IPInfo
 	ipStr := ip.String()
 	zap.S().Debugf("Getting IP info for %s", ipStr)
+	if localCache == nil {
+		localCache = make(map[string]IPInfo)
+	}
+	if val, ok := localCache[ipStr]; ok {
+		return val, nil
+	}
+
 	err := db.QueryRow(
 		"SELECT ip, hostname, anycast, city, region, country, loc, org, postal, tz FROM ip_info WHERE ip = $1",
 		ipStr).Scan(
@@ -91,5 +100,12 @@ func GetIPInfoFromAPI(ip net.IP) (IPInfo, error) {
 	if err != nil {
 		return IPInfo{}, fmt.Errorf("error decoding JSON: %s", err)
 	}
+
+	// Update cache
+	if localCache == nil {
+		localCache = make(map[string]IPInfo)
+	}
+	localCache[ip.String()] = ipInfo
+
 	return ipInfo, nil
 }
