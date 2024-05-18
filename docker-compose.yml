@@ -1,7 +1,7 @@
 version: "3.9"
 services:
   parser:
-    image: ghcr.io/scarjit/endlessh-parser:latest
+    image: ghcr.io/scarjit/endlesssh-to-postgres:latest
     environment:
       - DB_HOST=timescaledb
       - DB_PORT=5432
