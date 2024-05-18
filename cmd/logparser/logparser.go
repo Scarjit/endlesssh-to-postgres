@@ -15,6 +15,7 @@ import (
 )
 
 func ParseLog(db *sql.DB) error {
+	zap.S().Debugf("Parsing log file")
 	file, err := os.Open("/endlessh.log")
 	if err != nil {
 		return err
@@ -30,6 +31,7 @@ func ParseLog(db *sql.DB) error {
 		}
 		lines = append(lines, ll)
 	}
+	zap.S().Debugf("Read %d lines", len(lines))
 
 	// remove duplicates by line.Host
 	sort.SliceStable(
@@ -38,17 +40,24 @@ func ParseLog(db *sql.DB) error {
 		})
 
 	lines = removeDuplicateLL(lines)
+	zap.S().Debugf("Removed duplicates, %d lines left", len(lines))
 
 	for _, line := range lines {
 		HandleLine(line, db)
 	}
+	zap.S().Debugf("Handled %d lines", len(lines))
 
 	// Reset log file
-	file.Close()
+	err = file.Close()
+	if err != nil {
+		return err
+	}
+	zap.S().Debugf("Resetting log file")
 	err = os.Truncate("/endlessh.log", 0)
 	if err != nil {
 		return err
 	}
+	zap.S().Debugf("Log file reset")
 
 	return nil
 }
